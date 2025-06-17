@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Notarial Digital - Modelo Profesional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF CDN para generación de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f2f5;
+        }
+        .container-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background-image: linear-gradient(to right, #4F46E5, #3730A3); /* Indigo-600 to Indigo-800 */
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-image: linear-gradient(to right, #4338CA, #312E81); /* Darker Indigo on hover */
+        }
+        .btn-secondary {
+            background-color: #4B5563; /* Gray-700 */
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #6B7280; /* Gray-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1.px rgba(0, 0, 0, 0.06);
+        }
+        .input-field {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #D1D5DB; /* Gray-300 */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151; /* Gray-700 */
+        }
+        .step-section {
+            border: 1px solid #E5E7EB; /* Gray-200 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #FFFFFF;
+        }
+        .qr-code-placeholder {
+            width: 150px;
+            height: 150px;
+            background-color: #E5E7EB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-align: center;
+            line-height: 1.2;
+            padding: 5px;
+        }
+        .renap-lookup-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        .renap-lookup-group .input-field {
+            flex-grow: 1;
+        }
+        .renap-lookup-btn {
+            background-color: #10B981; /* Esmeralda-600 */
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        .renap-lookup-btn:hover {
+            background-color: #059669; /* Esmeralda-700 */
+        }
+        .alert-box {
+            background-color: #FEF3C7; /* Amarillo-100 */
+            color: #92400E; /* Marrón-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #FCD34D; /* Amarillo-300 */
+            font-size: 0.875rem;
+        }
+        /* Custom image styles to ensure they fit well */
+        .logo-image {
+            width: 80px; /* Or adjust as needed */
+            height: 80px; /* Or adjust as needed */
+            object-fit: contain; /* Ensures the whole image is visible */
+        }
+        .main-menu-btn {
+            @apply w-full py-4 text-lg rounded-lg text-white font-bold mb-4;
+            background-image: linear-gradient(to right, #4F46E5, #3730A3); /* Indigo-600 to Indigo-800 */
+            transition: all 0.3s ease;
+        }
+        .main-menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-image: linear-gradient(to right, #4338CA, #312E81);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl container-shadow">
+        <!-- Logos -->
+        <div class="flex justify-center items-center gap-6 mb-8">
+            <img src="ColegioDeAbogadosYNotariosDeGuatemala.svg.png" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E7FF/1F2937?text=Colegio';" alt="Logo Colegio de Abogados y Notarios" class="rounded-full shadow-md logo-image">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-900">
+                Protocolo Notarial Digital
+            </h1>
+            <img src="Organismo_Judicial_Guatemala_Logo.svg.png" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E7FF/1F2937?text=OJ';" alt="Logo Organismo Judicial" class="rounded-full shadow-md logo-image">
+        </div>
+        <p class="text-center text-gray-600 mb-8">
+            Simulación del proceso de creación y gestión de un instrumento público digital.
+        </p>
+
+        <!-- Mensaje de Alerta General -->
+        <div class="alert-box">
+            <strong>Nota:</strong> Esta es una aplicación modelo. La funcionalidad de "Consultar RENAP" y la generación de PDF son simuladas y no se conectan a sistemas externos reales.
+        </div>
+
+        <!-- Sección de Inicio de Sesión del Notario -->
+        <div id="notary-login-section" class="step-section">
+            <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Paso 1: Inicio de Sesión del Notario</h2>
+            <div class="mb-4">
+                <label for="notary-name" class="label block">Nombre del Notario:</label>
+                <input type="text" id="notary-name" class="input-field" placeholder="Ej. Juan Pérez" value="Lic. Ana María Rosales" required>
+            </div>
+            <div class="mb-4">
+                <label for="notary-collegiate" class="label block">Número de Colegiado:</label>
+                <input type="text" id="notary-collegiate" class="input-field" placeholder="Ej. 12345" value="12345" required>
+            </div>
+            <button id="start-process-btn" class="w-full py-3 rounded-lg text-white font-bold btn-primary">
+                Iniciar Sesión
+            </button>
+        </div>
+
+        <!-- Sección de Menú Principal -->
+        <div id="main-menu-section" class="hidden step-section">
+            <h2 class="text-2xl font-semibold text-indigo-800 mb-6">Menú Principal</h2>
+            <button id="goto-instrument-creation-btn" class="main-menu-btn">
+                Generación de Instrumento Público
+            </button>
+            <button id="goto-consultas-btn" class="main-menu-btn">
+                Consultas de Instrumentos
+            </button>
+            <button id="goto-boletas-pago-btn" class="main-menu-btn">
+                Generación de Boletas de Pago
+            </button>
+            <button id="logout-btn" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-6">
+                Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- Sección de Contenido Principal (oculta por defecto, gestionada por navegación) -->
+        <div id="main-content-area" class="hidden">
+            <!-- Sección de Creación del Instrumento -->
+            <div id="instrument-creation-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Generación de Instrumento Público</h2>
+
+                <div class="mb-4">
+                    <label for="instrument-type" class="label block">Tipo de Instrumento:</label>
+                    <select id="instrument-type" class="input-field" required>
+                        <option value="">Seleccione un tipo de instrumento</option>
+                        <option value="Compraventa de Vehículo" selected>Compraventa de Vehículo</option>
+                        <option value="Mandato General con Representación">Mandato General con Representación</option>
+                        <option value="Reconocimiento de Deuda">Reconocimiento de Deuda</option>
+                        <option value="Donación entre Vivos">Donación entre Vivos</option>
+                        <option value="Testamento Común Abierto">Testamento Común Abierto</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+
+                <h3 class="text-xl font-semibold text-indigo-700 mb-3 mt-6">Datos de las Partes</h3>
+
+                <!-- Parte 1: Vendedor/Otorgante 1 -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200">
+                    <p class="font-semibold text-gray-800 mb-2">Parte 1 (Vendedor/Otorgante):</p>
+                    <div class="mb-3">
+                        <label for="party1-name" class="label block text-sm">Nombre Completo:</label>
+                        <input type="text" id="party1-name" class="input-field" placeholder="Ej. Ana María Pérez López" value="Ana María Pérez López" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="party1-dpi" class="label block text-sm">Número de DPI:</label>
+                        <div class="renap-lookup-group">
+                            <input type="text" id="party1-dpi" class="input-field" placeholder="Ej. 1234567890101" value="1234567890101" required>
+                            <button type="button" class="renap-lookup-btn" data-party="1">Consultar RENAP (Simulado)</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="party1-details" class="label block text-sm">Otros Detalles (edad, estado civil, ocupación, domicilio):</label>
+                        <input type="text" id="party1-details" class="input-field" placeholder="Ej. 45 años, soltera, ama de casa, de este domicilio" value="45 años de edad, soltera, guatemalteca, ama de casa, de este domicilio" required>
+                    </div>
+                </div>
+
+                <!-- Parte 2: Comprador/Otorgante 2 -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+                    <p class="font-semibold text-gray-800 mb-2">Parte 2 (Comprador/Otorgante):</p>
+                    <div class="mb-3">
+                        <label for="party2-name" class="label block text-sm">Nombre Completo:</label>
+                        <input type="text" id="party2-name" class="input-field" placeholder="Ej. Carlos Antonio Ramírez Soto" value="Carlos Antonio Ramírez Soto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="party2-dpi" class="label block text-sm">Número de DPI:</label>
+                        <div class="renap-lookup-group">
+                            <input type="text" id="party2-dpi" class="input-field" placeholder="Ej. 9876543210101" value="9876543210101" required>
+                            <button type="button" class="renap-lookup-btn" data-party="2">Consultar RENAP (Simulado)</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="party2-details" class="label block text-sm">Otros Detalles (edad, estado civil, ocupación, domicilio):</label>
+                        <input type="text" id="party2-details" class="input-field" placeholder="Ej. 52 años, casado, comerciante, de este domicilio" value="52 años de edad, casado, guatemalteco, comerciante, de este domicilio" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="instrument-content" class="label block">Contenido Principal del Instrumento:</label>
+                    <textarea id="instrument-content" rows="6" class="input-field" required>Descripción del vehículo: Marca TOYOTA, línea COROLLA, modelo 2020, color NEGRO, chasis #ABC123XYZ, motor #DEF456UVW, placas P123ABC.
+Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.</textarea>
+                </div>
+                <button id="generate-folio-btn" class="w-full py-3 rounded-lg text-white font-bold btn-primary">
+                    Generar Folio Digital y Vista Previa
+                </button>
+                <button id="back-to-menu-from-creation" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+
+            <!-- Sección de Folio Digital y Pagos -->
+            <div id="folio-payment-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Paso 3: Folio Digital y Pagos Electrónicos</h2>
+                <p class="mb-4 text-gray-700">
+                    Se ha generado el folio digital y el código de verificación para este instrumento.
+                </p>
+                <div class="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-200">
+                    <p class="text-lg font-bold text-indigo-900">Código de Verificación Digital del Folio:</p>
+                    <p id="digital-folio-code" class="text-2xl font-extrabold text-indigo-900 mt-2">GT-PRT-2025-XXXXXX-X</p>
+                    <p class="text-sm text-gray-600 mt-2">Valor por folio digital: <span id="folio-value">Q. 10.00</span> (pagado electrónicamente)</p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="label">Simulación de Pago de Impuestos y Timbres:</p>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Impuesto al Valor Agregado (IVA): <span class="font-semibold">Q. 4,200.00</span></li>
+                        <li>Timbre Fiscal: <span class="font-semibold">Q. 500.00</span></li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-2">Número de Operación Bancaria (simulado): <span id="bank-op-num">OP-123456789</span></p>
+                </div>
+                <button id="simulate-payment-btn" class="w-full py-3 rounded-lg text-white font-bold btn-primary">
+                    Simular Pago Electrónico (Banca en Línea)
+                </button>
+                <p id="payment-status" class="text-green-700 font-semibold mt-4 text-center hidden">¡Pago realizado exitosamente y adhesión digital confirmada!</p>
+                <button id="proceed-to-sign-btn" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4 hidden">
+                    Continuar a Firma Física y Carga
+                </button>
+                <button id="back-to-menu-from-payment" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+
+            <!-- Sección de Firma Física y Carga -->
+            <div id="physical-sign-upload-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Paso 4: Firma Física y Carga del Documento</h2>
+                <p class="mb-4 text-gray-700">
+                    Por favor, imprima el instrumento, obtenga las firmas físicas de las partes y luego digitalícelo (escanee) para cargarlo al sistema.
+                </p>
+                <div class="mb-4">
+                    <label for="document-upload" class="label block">Cargar Documento Firmado Físicamente (PDF/Imagen):</label>
+                    <input type="file" id="document-upload" accept=".pdf,.jpg,.jpeg,.png" class="input-field py-2" required>
+                </div>
+                <button id="upload-document-btn" class="w-full py-3 rounded-lg text-white font-bold btn-primary">
+                    Cargar Documento Digitalizado
+                </button>
+                <p id="upload-status" class="text-green-700 font-semibold mt-4 text-center hidden">¡Documento cargado exitosamente!</p>
+                <button id="notary-sign-btn" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4 hidden">
+                    Aplicar Firma Electrónica del Notario y Generar PDF
+                </button>
+                <button id="back-to-menu-from-upload" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+
+            <!-- Sección de Firma Electrónica del Notario y Verificación AGP -->
+            <div id="notary-esign-agp-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Paso 5: Firma Electrónica Notarial y Registro AGP</h2>
+                <p class="mb-4 text-gray-700">
+                    La firma electrónica certificada del Notario será aplicada al documento, y este se registrará en el Archivo General de Protocolos.
+                </p>
+                <div class="flex flex-col items-center justify-center p-6 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <div class="qr-code-placeholder mb-4">
+                        <p>CÓDIGO QR DE VERIFICACIÓN (Simulado)</p>
+                    </div>
+                    <p class="text-lg font-bold text-indigo-900 text-center">Instrumento Registrado en AGP</p>
+                    <p class="text-sm text-gray-600 text-center mt-2">Escanee este código para verificar la autenticidad y el estado del documento.</p>
+                    <a href="#" class="text-indigo-600 hover:underline mt-2">Ver en el portal del AGP (simulado)</a>
+                </div>
+                <p id="final-status" class="text-green-700 font-semibold mt-4 text-center hidden">¡Proceso completado! El instrumento está disponible para verificación.</p>
+                <button id="back-to-menu-from-final" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+
+            <!-- Sección de Consultas -->
+            <div id="consultas-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Consultas de Instrumentos</h2>
+                <p class="mb-4 text-gray-700">Aquí puede consultar los instrumentos generados. (Simulado)</p>
+                <div id="generated-instruments-list" class="bg-gray-100 p-4 rounded-lg min-h-[100px] border border-gray-200 mb-6">
+                    <p class="text-gray-600">No hay instrumentos generados para mostrar.</p>
+                </div>
+                <button id="back-to-menu-from-consultas" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+
+            <!-- Sección de Generación de Boletas de Pago -->
+            <div id="boletas-pago-section" class="hidden step-section">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Generación de Boletas de Pago</h2>
+                <p class="mb-4 text-gray-700">Genere boletas de pago para impuestos y timbres. (Simulado)</p>
+                <div class="mb-4">
+                    <label for="tax-type" class="label block">Tipo de Impuesto:</label>
+                    <select id="tax-type" class="input-field" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="IVA - Compraventa">IVA - Compraventa</option>
+                        <option value="Timbre Fiscal">Timbre Fiscal</option>
+                        <option value="Valor Folio Digital">Valor Folio Digital</option>
+                        <option value="Otros Impuestos">Otros Impuestos</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="tax-amount" class="label block">Monto (Q):</label>
+                    <input type="number" id="tax-amount" class="input-field" placeholder="Ej. 100.00" value="10.00" step="0.01" required>
+                </div>
+                <button id="generate-payment-slip-btn" class="w-full py-3 rounded-lg text-white font-bold btn-primary">
+                    Generar Boleta de Pago (Simulado)
+                </button>
+                <p id="payment-slip-result" class="text-green-700 font-semibold mt-4 text-center hidden">Boleta de pago generada. Referencia: <span id="payment-slip-ref"></span></p>
+                <button id="back-to-menu-from-boletas" class="w-full py-3 rounded-lg text-white font-bold btn-secondary mt-4">
+                    Volver al Menú Principal
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensajes de Alerta -->
+        <div id="message-box" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-lg p-6 max-w-sm w-full container-shadow">
+                <h3 id="message-title" class="text-xl font-bold mb-4 text-indigo-900"></h3>
+                <p id="message-content" class="text-gray-700 mb-6"></p>
+                <button id="message-ok-btn" class="w-full py-2 rounded-lg text-white font-bold btn-primary">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+
+        <!-- Pie de Página Personalizado -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>Desarrollado por Oscar Iván Aguilar</p>
+            <p class="mt-1 text-xs">Con fines exclusivamente académicos.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Inicializa jsPDF para el entorno de UMD
+        const { jsPDF } = window.jspdf;
+
+        // Variables para almacenar datos a través de los pasos
+        let notaryData = {};
+        let instrumentData = {};
+        let partiesData = {
+            party1: { name: '', dpi: '', details: '' },
+            party2: { name: '', dpi: '', details: '' }
+        };
+        let folioCode = '';
+        let paymentInfo = {};
+        // Almacenar instrumentos generados para la sección de consultas
+        let generatedInstruments = [];
+
+        // Función para mostrar/ocultar secciones
+        function showSection(sectionId) {
+            const sections = [
+                'notary-login-section',
+                'main-menu-section',
+                'instrument-creation-section',
+                'folio-payment-section',
+                'physical-sign-upload-section',
+                'notary-esign-agp-section',
+                'consultas-section',
+                'boletas-pago-section'
+            ];
+            // Ocultar todas las secciones
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Mostrar la sección solicitada
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // La sección de contenido principal es el contenedor de todas las secciones funcionales
+            // Se muestra si la sección actual NO es la de login o menú principal
+            const mainContentArea = document.getElementById('main-content-area');
+            if (sectionId !== 'notary-login-section' && sectionId !== 'main-menu-section') {
+                mainContentArea.classList.remove('hidden');
+            } else {
+                mainContentArea.classList.add('hidden');
+            }
+        }
+
+        // Función para mostrar mensajes de alerta personalizados
+        function showMessageBox(title, content, onOk = null) {
+            document.getElementById('message-title').innerText = title;
+            document.getElementById('message-content').innerText = content;
+            document.getElementById('message-box').classList.remove('hidden');
+
+            const okButton = document.getElementById('message-ok-btn');
+            okButton.onclick = () => {
+                document.getElementById('message-box').classList.add('hidden');
+                if (onOk) {
+                    onOk();
+                }
+            };
+        }
+
+        // Función para actualizar la lista de instrumentos generados en la sección de consultas
+        function updateGeneratedInstrumentsList() {
+            const listElement = document.getElementById('generated-instruments-list');
+            listElement.innerHTML = ''; // Limpiar lista actual
+
+            if (generatedInstruments.length === 0) {
+                listElement.innerHTML = '<p class="text-gray-600">No hay instrumentos generados para mostrar.</p>';
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside space-y-2';
+                generatedInstruments.forEach((instrument, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'text-gray-800';
+                    li.innerHTML = `**Instrumento ${index + 1}:** ${instrument.type} (Folio: ${instrument.folioCode}) <button class="text-indigo-600 hover:underline ml-2 text-sm" onclick="viewInstrumentDetails(${index})">Ver Detalles</button>`;
+                    ul.appendChild(li);
+                });
+                listElement.appendChild(ul);
+            }
+        }
+
+        // Función simulada para ver detalles de un instrumento
+        window.viewInstrumentDetails = function(index) {
+            const instrument = generatedInstruments[index];
+            const details = `
+                **Tipo:** ${instrument.type}
+                **Folio Digital:** ${instrument.folioCode}
+                **Notario:** ${instrument.notary.name} (${instrument.notary.collegiate})
+                **Parte 1:** ${instrument.party1.name} (DPI: ${instrument.party1.dpi})
+                **Parte 2:** ${instrument.party2.name} (DPI: ${instrument.party2.dpi})
+                **Contenido:** ${instrument.content.substring(0, 100)}...
+                **Pagos:** IVA: ${instrument.payment.iva}, Timbre: ${instrument.payment.timbreFiscal}
+            `;
+            showMessageBox(`Detalles del Instrumento ${index + 1}`, details.replace(/\n/g, '<br>'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias a elementos
+            const notaryLoginSection = document.getElementById('notary-login-section');
+            const mainMenuSection = document.getElementById('main-menu-section');
+            const instrumentCreationSection = document.getElementById('instrument-creation-section');
+            const folioPaymentSection = document.getElementById('folio-payment-section');
+            const physicalSignUploadSection = document.getElementById('physical-sign-upload-section');
+            const notaryEsignAgpSection = document.getElementById('notary-esign-agp-section');
+            const consultasSection = document.getElementById('consultas-section');
+            const boletasPagoSection = document.getElementById('boletas-pago-section');
+
+            const startProcessBtn = document.getElementById('start-process-btn');
+            const gotoInstrumentCreationBtn = document.getElementById('goto-instrument-creation-btn');
+            const gotoConsultasBtn = document.getElementById('goto-consultas-btn');
+            const gotoBoletasPagoBtn = document.getElementById('goto-boletas-pago-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            const generateFolioBtn = document.getElementById('generate-folio-btn');
+            const simulatePaymentBtn = document.getElementById('simulate-payment-btn');
+            const proceedToSignBtn = document.getElementById('proceed-to-sign-btn');
+            const uploadDocumentBtn = document.getElementById('upload-document-btn');
+            const notarySignBtn = document.getElementById('notary-sign-btn');
+            const generatePaymentSlipBtn = document.getElementById('generate-payment-slip-btn');
+
+            const digitalFolioCodeElem = document.getElementById('digital-folio-code');
+            const paymentStatus = document.getElementById('payment-status');
+            const uploadStatus = document.getElementById('upload-status');
+            const finalStatus = document.getElementById('final-status');
+            const paymentSlipResult = document.getElementById('payment-slip-result');
+            const paymentSlipRef = document.getElementById('payment-slip-ref');
+
+            // Botones de "Volver al Menú Principal"
+            document.querySelectorAll('[id^="back-to-menu-from-"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    showSection('main-menu-section');
+                    // Reiniciar el formulario de creación de instrumento para el próximo uso
+                    document.getElementById('instrument-type').value = 'Compraventa de Vehículo';
+                    document.getElementById('party1-name').value = 'Ana María Pérez López';
+                    document.getElementById('party1-dpi').value = '1234567890101';
+                    document.getElementById('party1-details').value = '45 años de edad, soltera, guatemalteca, ama de casa, de este domicilio';
+                    document.getElementById('party2-name').value = 'Carlos Antonio Ramírez Soto';
+                    document.getElementById('party2-dpi').value = '9876543210101';
+                    document.getElementById('party2-details').value = '52 años de edad, casado, guatemalteco, comerciante, de este domicilio';
+                    document.getElementById('instrument-content').value = `Descripción del vehículo: Marca TOYOTA, línea COROLLA, modelo 2020, color NEGRO, chasis #ABC123XYZ, motor #DEF456UVW, placas P123ABC.
+Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.`;
+                    // Restablecer el estado de los botones de la sección de creación/firma
+                    simulatePaymentBtn.disabled = false;
+                    simulatePaymentBtn.innerText = 'Simular Pago Electrónico (Banca en Línea)';
+                    paymentStatus.classList.add('hidden');
+                    proceedToSignBtn.classList.add('hidden');
+                    simulatePaymentBtn.classList.remove('hidden');
+
+                    uploadDocumentBtn.disabled = false;
+                    uploadDocumentBtn.innerText = 'Cargar Documento Digitalizado';
+                    uploadStatus.classList.add('hidden');
+                    notarySignBtn.classList.add('hidden');
+                    uploadDocumentBtn.classList.remove('hidden');
+                    finalStatus.classList.add('hidden');
+                    document.getElementById('document-upload').value = ''; // Clear file input
+                });
+            });
+
+
+            // Paso 1: Inicio de Sesión
+            startProcessBtn.addEventListener('click', () => {
+                notaryData.name = document.getElementById('notary-name').value.trim();
+                notaryData.collegiate = document.getElementById('notary-collegiate').value.trim();
+
+                if (notaryData.name && notaryData.collegiate) {
+                    showMessageBox("Inicio Exitoso", `Bienvenido/a Notario/a ${notaryData.name}.`, () => {
+                        showSection('main-menu-section');
+                    });
+                } else {
+                    showMessageBox("Campos Requeridos", "Por favor, complete su nombre y número de colegiado para continuar.");
+                }
+            });
+
+            // Navegación desde el Menú Principal
+            gotoInstrumentCreationBtn.addEventListener('click', () => showSection('instrument-creation-section'));
+            gotoConsultasBtn.addEventListener('click', () => {
+                updateGeneratedInstrumentsList(); // Actualiza la lista antes de mostrar
+                showSection('consultas-section');
+            });
+            gotoBoletasPagoBtn.addEventListener('click', () => showSection('boletas-pago-section'));
+            logoutBtn.addEventListener('click', () => {
+                showMessageBox("Sesión Cerrada", "Ha cerrado su sesión. Vuelva pronto.", () => {
+                    notaryData = {};
+                    generatedInstruments = []; // Limpiar instrumentos al cerrar sesión
+                    showSection('notary-login-section');
+                });
+            });
+
+            // Simulación de consulta a RENAP
+            document.querySelectorAll('.renap-lookup-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const partyNum = event.target.dataset.party;
+                    let fakeName = '';
+                    let fakeDetails = '';
+
+                    if (partyNum === '1') {
+                        fakeName = "Ana María Pérez López";
+                        fakeDetails = "45 años de edad, soltera, guatemalteca, ama de casa, de este domicilio";
+                    } else if (partyNum === '2') {
+                        fakeName = "Carlos Antonio Ramírez Soto";
+                        fakeDetails = "52 años de edad, casado, guatemalteco, comerciante, de este domicilio";
+                    }
+
+                    document.getElementById(`party${partyNum}-name`).value = fakeName;
+                    document.getElementById(`party${partyNum}-details`).value = fakeDetails;
+                    showMessageBox("Consulta RENAP (Simulada)", `Datos simulados para la Parte ${partyNum} cargados. Esta es una demostración, no una conexión real.`);
+                });
+            });
+
+            // Paso 2: Generar Folio Digital y Vista Previa (desde Instrument Creation)
+            generateFolioBtn.addEventListener('click', () => {
+                instrumentData.type = document.getElementById('instrument-type').value.trim();
+                partiesData.party1.name = document.getElementById('party1-name').value.trim();
+                partiesData.party1.dpi = document.getElementById('party1-dpi').value.trim();
+                partiesData.party1.details = document.getElementById('party1-details').value.trim();
+                partiesData.party2.name = document.getElementById('party2-name').value.trim();
+                partiesData.party2.dpi = document.getElementById('party2-dpi').value.trim();
+                partiesData.party2.details = document.getElementById('party2-details').value.trim();
+                instrumentData.content = document.getElementById('instrument-content').value.trim();
+
+                if (instrumentData.type && partiesData.party1.name && partiesData.party1.dpi && partiesData.party1.details &&
+                    partiesData.party2.name && partiesData.party2.dpi && partiesData.party2.details && instrumentData.content) {
+
+                    folioCode = generateRandomFolioCode();
+                    digitalFolioCodeElem.innerText = folioCode;
+                    showMessageBox("Folio Digital Generado", `El Código de Verificación Digital del Folio es: ${folioCode}. ¡Ahora puede proceder con los pagos!`, () => {
+                        showSection('folio-payment-section');
+                    });
+                } else {
+                    showMessageBox("Campos Requeridos", "Por favor, complete todos los campos del instrumento y de las partes para generar el folio.");
+                }
+            });
+
+            // Paso 3: Simular Pago Electrónico
+            simulatePaymentBtn.addEventListener('click', () => {
+                simulatePaymentBtn.disabled = true;
+                simulatePaymentBtn.innerText = 'Procesando Pago...';
+                setTimeout(() => {
+                    paymentInfo = {
+                        folioValue: document.getElementById('folio-value').innerText,
+                        iva: 'Q. 4,200.00',
+                        timbreFiscal: 'Q. 500.00',
+                        bankOpNum: 'OP-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
+                        date: new Date().toLocaleDateString('es-GT'),
+                        time: new Date().toLocaleTimeString('es-GT')
+                    };
+                    document.getElementById('bank-op-num').innerText = paymentInfo.bankOpNum; // Update simulated bank op num
+                    paymentStatus.classList.remove('hidden');
+                    proceedToSignBtn.classList.remove('hidden');
+                    simulatePaymentBtn.classList.add('hidden');
+                    showMessageBox("Pago Exitoso", "El pago electrónico del folio, IVA y timbre fiscal ha sido procesado y adherido digitalmente.");
+                }, 1500);
+            });
+
+            // Continuar a la firma física
+            proceedToSignBtn.addEventListener('click', () => {
+                showSection('physical-sign-upload-section');
+            });
+
+            // Paso 4: Cargar Documento Digitalizado
+            uploadDocumentBtn.addEventListener('click', () => {
+                const fileInput = document.getElementById('document-upload');
+                if (fileInput.files.length > 0) {
+                    uploadDocumentBtn.disabled = true;
+                    uploadDocumentBtn.innerText = 'Cargando Documento...';
+                    setTimeout(() => {
+                        uploadStatus.classList.remove('hidden');
+                        notarySignBtn.classList.remove('hidden');
+                        uploadDocumentBtn.classList.add('hidden');
+                        showMessageBox("Carga Exitosa", "El documento firmado físicamente ha sido digitalizado y cargado al sistema.");
+                    }, 1500);
+                } else {
+                    showMessageBox("Archivo Requerido", "Por favor, seleccione un archivo (PDF/Imagen) para cargar el documento firmado.");
+                }
+            });
+
+            // Paso 5: Aplicar Firma Electrónica del Notario y Generar PDF
+            notarySignBtn.addEventListener('click', () => {
+                notarySignBtn.disabled = true;
+                notarySignBtn.innerText = 'Aplicando Firma Digital...';
+                setTimeout(() => {
+                    generateInstrumentPDF(); // Llama a la función de generación de PDF
+
+                    // Guarda el instrumento generado para la sección de consultas
+                    generatedInstruments.push({
+                        type: instrumentData.type,
+                        folioCode: folioCode,
+                        notary: { ...notaryData },
+                        party1: { ...partiesData.party1 },
+                        party2: { ...partiesData.party2 },
+                        content: instrumentData.content,
+                        payment: { ...paymentInfo }
+                    });
+
+                    finalStatus.classList.remove('hidden');
+                    showSection('notary-esign-agp-section'); // Muestra la sección final
+                    notarySignBtn.classList.add('hidden');
+                    showMessageBox("Firma Electrónica Aplicada y Registrada", "La firma electrónica del Notario ha sido aplicada. El instrumento ha sido registrado en el Archivo General de Protocolos (AGP) y está disponible para verificación. ¡Se ha generado el PDF del instrumento!");
+                }, 1500);
+            });
+
+            // Generación de Boletas de Pago (Simulado)
+            generatePaymentSlipBtn.addEventListener('click', () => {
+                const taxType = document.getElementById('tax-type').value;
+                const taxAmount = parseFloat(document.getElementById('tax-amount').value);
+
+                if (taxType && !isNaN(taxAmount) && taxAmount > 0) {
+                    const slipRef = 'BLT-' + Math.random().toString(36).substring(2, 11).toUpperCase();
+                    paymentSlipRef.innerText = slipRef;
+                    paymentSlipResult.classList.remove('hidden');
+                    showMessageBox("Boleta Generada", `Se ha generado la boleta para ${taxType} por Q.${taxAmount.toFixed(2)}. Referencia: ${slipRef}`);
+                } else {
+                    showMessageBox("Error", "Por favor, seleccione un tipo de impuesto y un monto válido.");
+                }
+            });
+
+
+            // --- Función para generar el PDF del Instrumento Público ---
+            function generateInstrumentPDF() {
+                const doc = new jsPDF();
+                let y = 20;
+                const margin = 20;
+                const lineHeight = 7;
+                const currentDate = new Date().toLocaleDateString('es-GT', { day: 'numeric', month: 'long', year: 'numeric' });
+                const pageWidth = doc.internal.pageSize.width - (margin * 2);
+                const safePageWidthForText = pageWidth - 4; // Reduced by 4mm for safer justified text
+
+                // Set text color to navy blue for PDF
+                doc.setTextColor(30, 58, 138); // RGB for a dark navy blue (indigo-900)
+
+                // Title
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`INSTRUMENTO PÚBLICO NÚMERO UNO (1).`, doc.internal.pageSize.width / 2, y, { align: 'center' }); // Centered title
+                y += lineHeight * 3; // More space after title
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const introText = `En la ciudad de Guatemala, departamento de Guatemala, el ${currentDate}. ANTE MÍ: ${notaryData.name}, Notario, comparecen:`;
+                const introTextLines = doc.splitTextToSize(introText, safePageWidthForText);
+                doc.text(introTextLines, margin, y, { align: 'justify' });
+                y += introTextLines.length * lineHeight + lineHeight;
+
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Por una parte:`, margin, y);
+                y += lineHeight;
+                doc.setFont('helvetica', 'normal');
+                const party1DetailsText = `La señora ${partiesData.party1.name}, ${partiesData.party1.details}, quien se identifica con Documento Personal de Identificación (DPI) con Código Único de Identificación (CUI) número ${partiesData.party1.dpi}, extendido por el Registro Nacional de las Personas (RENAP).`;
+                const party1DetailsLines = doc.splitTextToSize(party1DetailsText, safePageWidthForText);
+                doc.text(party1DetailsLines, margin, y, { align: 'justify' });
+                y += party1DetailsLines.length * lineHeight + lineHeight;
+
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Y por la otra parte:`, margin, y);
+                y += lineHeight;
+                doc.setFont('helvetica', 'normal');
+                const party2DetailsText = `El señor ${partiesData.party2.name}, ${partiesData.party2.details}, quien se identifica con Documento Personal de Identificación (DPI) con Código Único de Identificación (CUI) número ${partiesData.party2.dpi}, extendido por el Registro Nacional de las Personas (RENAP).`;
+                const party2DetailsLines = doc.splitTextToSize(party2DetailsText, safePageWidthForText);
+                doc.text(party2DetailsLines, margin, y, { align: 'justify' });
+                y += party2DetailsLines.length * lineHeight + lineHeight;
+
+                const faithStatement = `Doy fe de que los comparecientes son de mi anterior conocimiento y de que se encuentran en el libre ejercicio de sus derechos civiles para celebrar el presente acto jurídico, y que, conforme el sistema de Protocolo Notarial Digital, el presente instrumento se extenderá en Folio Digital con el Código de Verificación Digital único: ${folioCode}.`;
+                const faithStatementLines = doc.splitTextToSize(faithStatement, safePageWidthForText);
+                doc.text(faithStatementLines, margin, y, { align: 'justify' });
+                y += faithStatementLines.length * lineHeight + lineHeight * 2; // More space before first clause
+
+                // PRIMERO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`PRIMERO: ANTECEDENTES`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                // Extract vehicle details from instrumentData.content
+                const vehicleDescriptionMatch = instrumentData.content.match(/Descripción del vehículo: (.*?)Precio:/s);
+                const vehicleDetails = vehicleDescriptionMatch ? vehicleDescriptionMatch[1].trim() : 'Marca [Marca], línea [Línea], modelo [Año], color [Color], chasis número [Número de Chasis], motor número [Número de Motor], y placas de circulación [Número de Placas]';
+                const antecedentesText = `Manifiesta la señora ${partiesData.party1.name}, bajo juramento de ley y advertida de las penas relativas al perjurio, que es legítima propietaria del vehículo tipo automóvil, ${vehicleDetails}.`;
+                const antecedentesTextLines = doc.splitTextToSize(antecedentesText, safePageWidthForText);
+                doc.text(antecedentesTextLines, margin, y, { align: 'justify' });
+                y += antecedentesTextLines.length * lineHeight + lineHeight;
+
+                // SEGUNDO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`SEGUNDO: ${instrumentData.type.toUpperCase()}`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const priceMatch = instrumentData.content.match(/Precio: (Q\. [0-9,\.]+\.[0-9]{2})/);
+                const price = priceMatch ? priceMatch[1] : '___________';
+                const contentRestMatch = instrumentData.content.match(/La vendedora declara no tener gravámenes y se obliga al saneamiento\. El comprador acepta la venta\./s);
+                const contentRest = contentRestMatch ? contentRestMatch[0].trim() : 'La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.';
+
+                const contentText = `Continúa manifestando la señora ${partiesData.party1.name} que, por el precio de ${price}, que tiene recibidos a su entera satisfacción del señor ${partiesData.party2.name}, vende, cede y traspasa a este último el vehículo descrito en la cláusula anterior, incluyendo en la venta todos los usos, costumbres, derechos y anexidades que le corresponden al mismo. ${contentRest}`;
+                const contentTextLines = doc.splitTextToSize(contentText, safePageWidthForText);
+                doc.text(contentTextLines, margin, y, { align: 'justify' });
+                y += contentTextLines.length * lineHeight + lineHeight;
+
+                // TERCERO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`TERCERO: SANEAMIENTO`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const saneamientoText = `La vendedora, señora ${partiesData.party1.name}, declara bajo juramento que sobre el vehículo que hoy enajena no pesan gravámenes, anotaciones o limitaciones que puedan afectar los derechos del comprador, y que, en todo caso, se obliga al saneamiento de ley.`;
+                const saneamientoTextLines = doc.splitTextToSize(saneamientoText, safePageWidthForText);
+                doc.text(saneamientoTextLines, margin, y, { align: 'justify' });
+                y += saneamientoTextLines.length * lineHeight + lineHeight;
+
+                // CUARTO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`CUARTO: ACEPTACIÓN`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const aceptacionText = `Por su parte, el señor ${partiesData.party2.name}, en los términos relacionados, acepta para sí la venta que por este acto se le hace del vehículo, dándose por recibido del mismo y del precio pagado.`;
+                const aceptacionTextLines = doc.splitTextToSize(aceptacionText, safePageWidthForText);
+                doc.text(aceptacionTextLines, margin, y, { align: 'justify' });
+                y += aceptacionTextLines.length * lineHeight + lineHeight;
+
+                // QUINTO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`QUINTO: IMPUESTOS Y TIMBRES`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const impuestosText = `Los comparecientes declaran que el Impuesto al Valor Agregado (IVA) y el Timbre Fiscal correspondientes a esta compraventa han sido pagados electrónicamente a través del sistema de banca en línea, y que los comprobantes electrónicos de pago y adhesión digital se encuentran asociados a este instrumento digitalmente. (Detalle de pagos: NIT del Notario: ${notaryData.collegiate}, Número de Operación Bancaria: ${paymentInfo.bankOpNum}, Monto IVA: ${paymentInfo.iva}, Monto Timbre: ${paymentInfo.timbreFiscal}, Fecha: ${paymentInfo.date} ${paymentInfo.time}).`;
+                const impuestosTextLines = doc.splitTextToSize(impuestosText, safePageWidthForText);
+                doc.text(impuestosTextLines, margin, y, { align: 'justify' });
+                y += impuestosTextLines.length * lineHeight + lineHeight;
+
+                // SEXTO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`SEXTO: ACEPTACIÓN Y FORMALIZACIÓN`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const formalizacionText = `Yo, el Notario, generé el presente instrumento en la plataforma digital del Protocolo Notarial Digital, el cual fue impreso para las firmas físicas de los otorgantes. Previo a las firmas, doy fe de que leí íntegramente todo lo escrito a los interesados, quienes enterados de su contenido, objeto, validez y demás efectos legales, lo ratifican, aceptan y firman físicamente. De todo lo anteriormente relacionado, DOY FE.`;
+                const formalizacionTextLines = doc.splitTextToSize(formalizacionText, safePageWidthForText);
+                doc.text(formalizacionTextLines, margin, y, { align: 'justify' });
+                y += formalizacionTextLines.length * lineHeight + lineHeight * 2; // Extra line height for spacing before signatures
+
+                // Firmas físicas (espacios para simular)
+                doc.setFontSize(10);
+                doc.text(`_________________________`, margin + 10, y);
+                doc.text(`${partiesData.party1.name}`, margin + 10, y + 5);
+                y += lineHeight * 2;
+
+                doc.text(`_________________________`, margin + 10, y);
+                doc.text(`${partiesData.party2.name}`, margin + 10, y + 5);
+                y += lineHeight * 2;
+
+                doc.text(`ANTE MÍ: _________________________`, margin + 10, y);
+                doc.text(`${notaryData.name}`, margin + 10, y + 5);
+                doc.text(`Notario`, margin + 10, y + 10);
+                doc.text(`Colegiado Activo No. ${notaryData.collegiate}`, margin + 10, y + 15);
+                y += lineHeight * 3;
+
+                // SÉPTIMO
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`SÉPTIMO: CARGA Y VERIFICACIÓN DIGITAL`, margin, y);
+                y += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const cargaText = `Una vez firmado físicamente, el documento fue digitalizado y cargado al sistema de Protocolo Notarial Digital, quedando registrado y accesible para el Archivo General de Protocolos (AGP) para su control y verificación.`;
+                const cargaTextLines = doc.splitTextToSize(cargaText, safePageWidthForText);
+                doc.text(cargaTextLines, margin, y, { align: 'justify' });
+                y += cargaTextLines.length * lineHeight + lineHeight;
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`ESTE INSTRUMENTO CONTIENE LA FIRMA ELECTRÓNICA CERTIFICADA DEL NOTARIO.`, margin, y);
+                y += lineHeight;
+                doc.setFont('helvetica', 'normal');
+                doc.text(`CÓDIGO QR DE VERIFICACIÓN: ${folioCode}`, margin, y);
+                doc.text(`*Escanee este código QR para verificar la autenticidad y el estado del documento en el sistema del Archivo General de Protocolos (AGP).*`, margin, y + lineHeight);
+
+                doc.save(`Instrumento_Publico_${instrumentData.type.replace(/\s/g, '_')}_${folioCode}.pdf`);
+            }
+        });
+    </script>
+</body>
+</html>
