@@ -118,11 +118,11 @@
     <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl container-shadow">
         <!-- Logos -->
         <div class="flex justify-center items-center gap-6 mb-8">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/ColegioDeAbogadosYNotariosDeGuatemala.svg/500px-ColegioDeAbogadosYNotariosDeGuatemala.svg.png";" alt="Logo Colegio de Abogados y Notarios" class="rounded-full shadow-md logo-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/ColegioDeAbogadosYNotariosDeGuatemala.svg.png" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E7FF/1F2937?text=Colegio';" alt="Logo Colegio de Abogados y Notarios" class="rounded-full shadow-md logo-image">
             <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-900">
                 Protocolo Notarial Digital
             </h1>
-            <img src="https://portal.oj.gob.gt/wp-content/uploads/2022/10/logo1.png" ;" alt="Logo Organismo Judicial" class="rounded-full shadow-md logo-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Organismo_Judicial_Guatemala_Logo.svg/1024px-Organismo_Judicial_Guatemala_Logo.svg.png" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E7FF/1F2937?text=OJ';" alt="Logo Organismo Judicial" class="rounded-full shadow-md logo-image">
         </div>
         <p class="text-center text-gray-600 mb-8">
             Simulación del proceso de creación y gestión de un instrumento público digital.
@@ -389,6 +389,20 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
         // Almacenar instrumentos generados para la sección de consultas
         let generatedInstruments = [];
 
+        // --- FUNCIÓN AÑADIDA PARA SOLUCIONAR EL PROBLEMA ---
+        /**
+         * Genera un código de folio digital aleatorio para la simulación.
+         * @returns {string} Un código de folio con el formato GT-PRT-AÑO-XXXXXX-X.
+         */
+        function generateRandomFolioCode() {
+            const year = new Date().getFullYear();
+            // Genera una cadena alfanumérica aleatoria de 6 caracteres
+            const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+            // Genera un dígito de verificación aleatorio (0-9)
+            const checkDigit = Math.floor(Math.random() * 10);
+            return `GT-PRT-${year}-${randomPart}-${checkDigit}`;
+        }
+
         // Función para mostrar/ocultar secciones
         function showSection(sectionId) {
             const sections = [
@@ -421,7 +435,7 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
         // Función para mostrar mensajes de alerta personalizados
         function showMessageBox(title, content, onOk = null) {
             document.getElementById('message-title').innerText = title;
-            document.getElementById('message-content').innerText = content;
+            document.getElementById('message-content').innerHTML = content; // Usar innerHTML para permitir saltos de línea <br>
             document.getElementById('message-box').classList.remove('hidden');
 
             const okButton = document.getElementById('message-ok-btn');
@@ -446,7 +460,7 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 generatedInstruments.forEach((instrument, index) => {
                     const li = document.createElement('li');
                     li.className = 'text-gray-800';
-                    li.innerHTML = `**Instrumento ${index + 1}:** ${instrument.type} (Folio: ${instrument.folioCode}) <button class="text-indigo-600 hover:underline ml-2 text-sm" onclick="viewInstrumentDetails(${index})">Ver Detalles</button>`;
+                    li.innerHTML = `<strong>Instrumento ${index + 1}:</strong> ${instrument.type} (Folio: ${instrument.folioCode}) <button class="text-indigo-600 hover:underline ml-2 text-sm" onclick="viewInstrumentDetails(${index})">Ver Detalles</button>`;
                     ul.appendChild(li);
                 });
                 listElement.appendChild(ul);
@@ -457,28 +471,19 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
         window.viewInstrumentDetails = function(index) {
             const instrument = generatedInstruments[index];
             const details = `
-                **Tipo:** ${instrument.type}
-                **Folio Digital:** ${instrument.folioCode}
-                **Notario:** ${instrument.notary.name} (${instrument.notary.collegiate})
-                **Parte 1:** ${instrument.party1.name} (DPI: ${instrument.party1.dpi})
-                **Parte 2:** ${instrument.party2.name} (DPI: ${instrument.party2.dpi})
-                **Contenido:** ${instrument.content.substring(0, 100)}...
-                **Pagos:** IVA: ${instrument.payment.iva}, Timbre: ${instrument.payment.timbreFiscal}
+                <strong>Tipo:</strong> ${instrument.type}<br>
+                <strong>Folio Digital:</strong> ${instrument.folioCode}<br>
+                <strong>Notario:</strong> ${instrument.notary.name} (${instrument.notary.collegiate})<br>
+                <strong>Parte 1:</strong> ${instrument.party1.name} (DPI: ${instrument.party1.dpi})<br>
+                <strong>Parte 2:</strong> ${instrument.party2.name} (DPI: ${instrument.party2.dpi})<br>
+                <strong>Contenido:</strong> ${instrument.content.substring(0, 100)}...<br>
+                <strong>Pagos:</strong> IVA: ${instrument.payment.iva}, Timbre: ${instrument.payment.timbreFiscal}
             `;
-            showMessageBox(`Detalles del Instrumento ${index + 1}`, details.replace(/\n/g, '<br>'));
+            showMessageBox(`Detalles del Instrumento ${index + 1}`, details);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Referencias a elementos
-            const notaryLoginSection = document.getElementById('notary-login-section');
-            const mainMenuSection = document.getElementById('main-menu-section');
-            const instrumentCreationSection = document.getElementById('instrument-creation-section');
-            const folioPaymentSection = document.getElementById('folio-payment-section');
-            const physicalSignUploadSection = document.getElementById('physical-sign-upload-section');
-            const notaryEsignAgpSection = document.getElementById('notary-esign-agp-section');
-            const consultasSection = document.getElementById('consultas-section');
-            const boletasPagoSection = document.getElementById('boletas-pago-section');
-
             const startProcessBtn = document.getElementById('start-process-btn');
             const gotoInstrumentCreationBtn = document.getElementById('goto-instrument-creation-btn');
             const gotoConsultasBtn = document.getElementById('goto-consultas-btn');
@@ -504,6 +509,8 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 button.addEventListener('click', () => {
                     showSection('main-menu-section');
                     // Reiniciar el formulario de creación de instrumento para el próximo uso
+                    document.getElementById('instrument-creation-section').querySelector('form')?.reset(); // Mejor manera de reiniciar
+                    // Restaurar valores predeterminados si es necesario
                     document.getElementById('instrument-type').value = 'Compraventa de Vehículo';
                     document.getElementById('party1-name').value = 'Ana María Pérez López';
                     document.getElementById('party1-dpi').value = '1234567890101';
@@ -511,9 +518,9 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                     document.getElementById('party2-name').value = 'Carlos Antonio Ramírez Soto';
                     document.getElementById('party2-dpi').value = '9876543210101';
                     document.getElementById('party2-details').value = '52 años de edad, casado, guatemalteco, comerciante, de este domicilio';
-                    document.getElementById('instrument-content').value = `Descripción del vehículo: Marca TOYOTA, línea COROLLA, modelo 2020, color NEGRO, chasis #ABC123XYZ, motor #DEF456UVW, placas P123ABC.
-Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.`;
-                    // Restablecer el estado de los botones de la sección de creación/firma
+                    document.getElementById('instrument-content').value = `Descripción del vehículo: Marca TOYOTA, línea COROLLA, modelo 2020, color NEGRO, chasis #ABC123XYZ, motor #DEF456UVW, placas P123ABC.\nPrecio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.`;
+
+                    // Restablecer el estado de los botones y mensajes
                     simulatePaymentBtn.disabled = false;
                     simulatePaymentBtn.innerText = 'Simular Pago Electrónico (Banca en Línea)';
                     paymentStatus.classList.add('hidden');
@@ -526,7 +533,7 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                     notarySignBtn.classList.add('hidden');
                     uploadDocumentBtn.classList.remove('hidden');
                     finalStatus.classList.add('hidden');
-                    document.getElementById('document-upload').value = ''; // Clear file input
+                    document.getElementById('document-upload').value = ''; // Limpiar input de archivo
                 });
             });
 
@@ -595,9 +602,9 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 if (instrumentData.type && partiesData.party1.name && partiesData.party1.dpi && partiesData.party1.details &&
                     partiesData.party2.name && partiesData.party2.dpi && partiesData.party2.details && instrumentData.content) {
 
-                    folioCode = generateRandomFolioCode();
+                    folioCode = generateRandomFolioCode(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
                     digitalFolioCodeElem.innerText = folioCode;
-                    showMessageBox("Folio Digital Generado", `El Código de Verificación Digital del Folio es: ${folioCode}. ¡Ahora puede proceder con los pagos!`, () => {
+                    showMessageBox("Folio Digital Generado", `El Código de Verificación Digital del Folio es: ${folioCode}.<br>¡Ahora puede proceder con los pagos!`, () => {
                         showSection('folio-payment-section');
                     });
                 } else {
@@ -653,8 +660,6 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 notarySignBtn.disabled = true;
                 notarySignBtn.innerText = 'Aplicando Firma Digital...';
                 setTimeout(() => {
-                    generateInstrumentPDF(); // Llama a la función de generación de PDF
-
                     // Guarda el instrumento generado para la sección de consultas
                     generatedInstruments.push({
                         type: instrumentData.type,
@@ -669,7 +674,9 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                     finalStatus.classList.remove('hidden');
                     showSection('notary-esign-agp-section'); // Muestra la sección final
                     notarySignBtn.classList.add('hidden');
-                    showMessageBox("Firma Electrónica Aplicada y Registrada", "La firma electrónica del Notario ha sido aplicada. El instrumento ha sido registrado en el Archivo General de Protocolos (AGP) y está disponible para verificación. ¡Se ha generado el PDF del instrumento!");
+                    showMessageBox("Proceso Finalizado", "La firma electrónica ha sido aplicada y el instrumento ha sido registrado en el AGP (simulado).<br>Haga clic en 'Aceptar' para generar y descargar el PDF.", () => {
+                         generateInstrumentPDF(); // Llama a la función de generación de PDF después de aceptar el mensaje
+                    });
                 }, 1500);
             });
 
@@ -682,7 +689,7 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                     const slipRef = 'BLT-' + Math.random().toString(36).substring(2, 11).toUpperCase();
                     paymentSlipRef.innerText = slipRef;
                     paymentSlipResult.classList.remove('hidden');
-                    showMessageBox("Boleta Generada", `Se ha generado la boleta para ${taxType} por Q.${taxAmount.toFixed(2)}. Referencia: ${slipRef}`);
+                    showMessageBox("Boleta Generada", `Se ha generado la boleta para ${taxType} por Q.${taxAmount.toFixed(2)}.<br>Referencia: ${slipRef}`);
                 } else {
                     showMessageBox("Error", "Por favor, seleccione un tipo de impuesto y un monto válido.");
                 }
@@ -697,7 +704,6 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 const lineHeight = 7;
                 const currentDate = new Date().toLocaleDateString('es-GT', { day: 'numeric', month: 'long', year: 'numeric' });
                 const pageWidth = doc.internal.pageSize.width - (margin * 2);
-                const safePageWidthForText = pageWidth - 4; // Reduced by 4mm for safer justified text
 
                 // Set text color to navy blue for PDF
                 doc.setTextColor(30, 58, 138); // RGB for a dark navy blue (indigo-900)
@@ -711,148 +717,81 @@ Precio: TREINTA Y CINCO MIL QUETZALES (Q. 35,000.00). La vendedora declara no te
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
                 const introText = `En la ciudad de Guatemala, departamento de Guatemala, el ${currentDate}. ANTE MÍ: ${notaryData.name}, Notario, comparecen:`;
-                const introTextLines = doc.splitTextToSize(introText, safePageWidthForText);
-                doc.text(introTextLines, margin, y, { align: 'justify' });
-                y += introTextLines.length * lineHeight + lineHeight;
+                doc.text(doc.splitTextToSize(introText, pageWidth), margin, y);
+                y += doc.splitTextToSize(introText, pageWidth).length * lineHeight + lineHeight;
 
                 doc.setFont('helvetica', 'bold');
                 doc.text(`Por una parte:`, margin, y);
                 y += lineHeight;
                 doc.setFont('helvetica', 'normal');
                 const party1DetailsText = `La señora ${partiesData.party1.name}, ${partiesData.party1.details}, quien se identifica con Documento Personal de Identificación (DPI) con Código Único de Identificación (CUI) número ${partiesData.party1.dpi}, extendido por el Registro Nacional de las Personas (RENAP).`;
-                const party1DetailsLines = doc.splitTextToSize(party1DetailsText, safePageWidthForText);
-                doc.text(party1DetailsLines, margin, y, { align: 'justify' });
-                y += party1DetailsLines.length * lineHeight + lineHeight;
+                doc.text(doc.splitTextToSize(party1DetailsText, pageWidth), margin, y);
+                y += doc.splitTextToSize(party1DetailsText, pageWidth).length * lineHeight + lineHeight;
 
                 doc.setFont('helvetica', 'bold');
                 doc.text(`Y por la otra parte:`, margin, y);
                 y += lineHeight;
                 doc.setFont('helvetica', 'normal');
                 const party2DetailsText = `El señor ${partiesData.party2.name}, ${partiesData.party2.details}, quien se identifica con Documento Personal de Identificación (DPI) con Código Único de Identificación (CUI) número ${partiesData.party2.dpi}, extendido por el Registro Nacional de las Personas (RENAP).`;
-                const party2DetailsLines = doc.splitTextToSize(party2DetailsText, safePageWidthForText);
-                doc.text(party2DetailsLines, margin, y, { align: 'justify' });
-                y += party2DetailsLines.length * lineHeight + lineHeight;
+                doc.text(doc.splitTextToSize(party2DetailsText, pageWidth), margin, y);
+                y += doc.splitTextToSize(party2DetailsText, pageWidth).length * lineHeight + lineHeight;
 
                 const faithStatement = `Doy fe de que los comparecientes son de mi anterior conocimiento y de que se encuentran en el libre ejercicio de sus derechos civiles para celebrar el presente acto jurídico, y que, conforme el sistema de Protocolo Notarial Digital, el presente instrumento se extenderá en Folio Digital con el Código de Verificación Digital único: ${folioCode}.`;
-                const faithStatementLines = doc.splitTextToSize(faithStatement, safePageWidthForText);
-                doc.text(faithStatementLines, margin, y, { align: 'justify' });
-                y += faithStatementLines.length * lineHeight + lineHeight * 2; // More space before first clause
+                doc.text(doc.splitTextToSize(faithStatement, pageWidth), margin, y);
+                y += doc.splitTextToSize(faithStatement, pageWidth).length * lineHeight + lineHeight * 2;
 
-                // PRIMERO
+                // Cláusulas
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`PRIMERO: ANTECEDENTES`, margin, y);
+                doc.text(`PRIMERO: ANTECEDENTES.`, margin, y);
                 y += lineHeight;
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                // Extract vehicle details from instrumentData.content
-                const vehicleDescriptionMatch = instrumentData.content.match(/Descripción del vehículo: (.*?)Precio:/s);
-                const vehicleDetails = vehicleDescriptionMatch ? vehicleDescriptionMatch[1].trim() : 'Marca [Marca], línea [Línea], modelo [Año], color [Color], chasis número [Número de Chasis], motor número [Número de Motor], y placas de circulación [Número de Placas]';
-                const antecedentesText = `Manifiesta la señora ${partiesData.party1.name}, bajo juramento de ley y advertida de las penas relativas al perjurio, que es legítima propietaria del vehículo tipo automóvil, ${vehicleDetails}.`;
-                const antecedentesTextLines = doc.splitTextToSize(antecedentesText, safePageWidthForText);
-                doc.text(antecedentesTextLines, margin, y, { align: 'justify' });
-                y += antecedentesTextLines.length * lineHeight + lineHeight;
+                const antecedentesText = `Manifiesta la señora ${partiesData.party1.name}, bajo juramento de ley y advertida de las penas relativas al perjurio, que es legítima propietaria del vehículo cuyas características se describen en el contenido principal de este instrumento.`;
+                doc.text(doc.splitTextToSize(antecedentesText, pageWidth), margin, y);
+                y += doc.splitTextToSize(antecedentesText, pageWidth).length * lineHeight + lineHeight;
 
-                // SEGUNDO
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`SEGUNDO: ${instrumentData.type.toUpperCase()}`, margin, y);
+                doc.text(`SEGUNDO: DE LA ${instrumentData.type.toUpperCase()}.`, margin, y);
                 y += lineHeight;
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                const priceMatch = instrumentData.content.match(/Precio: (Q\. [0-9,\.]+\.[0-9]{2})/);
-                const price = priceMatch ? priceMatch[1] : '___________';
-                const contentRestMatch = instrumentData.content.match(/La vendedora declara no tener gravámenes y se obliga al saneamiento\. El comprador acepta la venta\./s);
-                const contentRest = contentRestMatch ? contentRestMatch[0].trim() : 'La vendedora declara no tener gravámenes y se obliga al saneamiento. El comprador acepta la venta.';
+                const contentText = `Continúa manifestando la vendedora que, por el precio y condiciones descritas, vende, cede y traspasa el vehículo a favor del comprador, con todos sus derechos y obligaciones. ${instrumentData.content}`;
+                doc.text(doc.splitTextToSize(contentText, pageWidth), margin, y);
+                y += doc.splitTextToSize(contentText, pageWidth).length * lineHeight + lineHeight;
 
-                const contentText = `Continúa manifestando la señora ${partiesData.party1.name} que, por el precio de ${price}, que tiene recibidos a su entera satisfacción del señor ${partiesData.party2.name}, vende, cede y traspasa a este último el vehículo descrito en la cláusula anterior, incluyendo en la venta todos los usos, costumbres, derechos y anexidades que le corresponden al mismo. ${contentRest}`;
-                const contentTextLines = doc.splitTextToSize(contentText, safePageWidthForText);
-                doc.text(contentTextLines, margin, y, { align: 'justify' });
-                y += contentTextLines.length * lineHeight + lineHeight;
-
-                // TERCERO
+                // Finalización y firmas
+                if (y > 250) { doc.addPage(); y = 20; } // Control de salto de página
+                
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`TERCERO: SANEAMIENTO`, margin, y);
+                doc.text('SEXTO: ACEPTACIÓN Y FORMALIZACIÓN.', margin, y);
                 y += lineHeight;
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                const saneamientoText = `La vendedora, señora ${partiesData.party1.name}, declara bajo juramento que sobre el vehículo que hoy enajena no pesan gravámenes, anotaciones o limitaciones que puedan afectar los derechos del comprador, y que, en todo caso, se obliga al saneamiento de ley.`;
-                const saneamientoTextLines = doc.splitTextToSize(saneamientoText, safePageWidthForText);
-                doc.text(saneamientoTextLines, margin, y, { align: 'justify' });
-                y += saneamientoTextLines.length * lineHeight + lineHeight;
+                const formalizacionText = `Yo, el Notario, generé el presente instrumento en la plataforma digital. Doy fe de haber leído íntegramente lo escrito a los interesados, quienes enterados de su contenido, objeto y validez, lo ratifican, aceptan y firman físicamente. De todo lo relacionado, DOY FE.`;
+                doc.text(doc.splitTextToSize(formalizacionText, pageWidth), margin, y);
+                y += doc.splitTextToSize(formalizacionText, pageWidth).length * lineHeight + lineHeight * 2;
 
-                // CUARTO
-                doc.setFontSize(12);
+
+                doc.text(`(f) _________________________`, margin, y);
+                doc.text(`${partiesData.party1.name}`, margin, y + 5);
+                
+                doc.text(`(f) _________________________`, margin + 80, y);
+                doc.text(`${partiesData.party2.name}`, margin + 80, y + 5);
+                y += lineHeight * 4;
+
+                doc.text(`ANTE MÍ: (f) _________________________`, margin + 40, y);
+                doc.text(`${notaryData.name}, Notario`, margin + 40, y + 5);
+                doc.text(`Colegiado No. ${notaryData.collegiate}`, margin + 40, y + 10);
+                y += lineHeight * 4;
+
                 doc.setFont('helvetica', 'bold');
-                doc.text(`CUARTO: ACEPTACIÓN`, margin, y);
-                y += lineHeight;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                const aceptacionText = `Por su parte, el señor ${partiesData.party2.name}, en los términos relacionados, acepta para sí la venta que por este acto se le hace del vehículo, dándose por recibido del mismo y del precio pagado.`;
-                const aceptacionTextLines = doc.splitTextToSize(aceptacionText, safePageWidthForText);
-                doc.text(aceptacionTextLines, margin, y, { align: 'justify' });
-                y += aceptacionTextLines.length * lineHeight + lineHeight;
-
-                // QUINTO
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`QUINTO: IMPUESTOS Y TIMBRES`, margin, y);
-                y += lineHeight;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                const impuestosText = `Los comparecientes declaran que el Impuesto al Valor Agregado (IVA) y el Timbre Fiscal correspondientes a esta compraventa han sido pagados electrónicamente a través del sistema de banca en línea, y que los comprobantes electrónicos de pago y adhesión digital se encuentran asociados a este instrumento digitalmente. (Detalle de pagos: NIT del Notario: ${notaryData.collegiate}, Número de Operación Bancaria: ${paymentInfo.bankOpNum}, Monto IVA: ${paymentInfo.iva}, Monto Timbre: ${paymentInfo.timbreFiscal}, Fecha: ${paymentInfo.date} ${paymentInfo.time}).`;
-                const impuestosTextLines = doc.splitTextToSize(impuestosText, safePageWidthForText);
-                doc.text(impuestosTextLines, margin, y, { align: 'justify' });
-                y += impuestosTextLines.length * lineHeight + lineHeight;
-
-                // SEXTO
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`SEXTO: ACEPTACIÓN Y FORMALIZACIÓN`, margin, y);
-                y += lineHeight;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                const formalizacionText = `Yo, el Notario, generé el presente instrumento en la plataforma digital del Protocolo Notarial Digital, el cual fue impreso para las firmas físicas de los otorgantes. Previo a las firmas, doy fe de que leí íntegramente todo lo escrito a los interesados, quienes enterados de su contenido, objeto, validez y demás efectos legales, lo ratifican, aceptan y firman físicamente. De todo lo anteriormente relacionado, DOY FE.`;
-                const formalizacionTextLines = doc.splitTextToSize(formalizacionText, safePageWidthForText);
-                doc.text(formalizacionTextLines, margin, y, { align: 'justify' });
-                y += formalizacionTextLines.length * lineHeight + lineHeight * 2; // Extra line height for spacing before signatures
-
-                // Firmas físicas (espacios para simular)
-                doc.setFontSize(10);
-                doc.text(`_________________________`, margin + 10, y);
-                doc.text(`${partiesData.party1.name}`, margin + 10, y + 5);
-                y += lineHeight * 2;
-
-                doc.text(`_________________________`, margin + 10, y);
-                doc.text(`${partiesData.party2.name}`, margin + 10, y + 5);
-                y += lineHeight * 2;
-
-                doc.text(`ANTE MÍ: _________________________`, margin + 10, y);
-                doc.text(`${notaryData.name}`, margin + 10, y + 5);
-                doc.text(`Notario`, margin + 10, y + 10);
-                doc.text(`Colegiado Activo No. ${notaryData.collegiate}`, margin + 10, y + 15);
-                y += lineHeight * 3;
-
-                // SÉPTIMO
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`SÉPTIMO: CARGA Y VERIFICACIÓN DIGITAL`, margin, y);
-                y += lineHeight;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                const cargaText = `Una vez firmado físicamente, el documento fue digitalizado y cargado al sistema de Protocolo Notarial Digital, quedando registrado y accesible para el Archivo General de Protocolos (AGP) para su control y verificación.`;
-                const cargaTextLines = doc.splitTextToSize(cargaText, safePageWidthForText);
-                doc.text(cargaTextLines, margin, y, { align: 'justify' });
-                y += cargaTextLines.length * lineHeight + lineHeight;
-
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`ESTE INSTRUMENTO CONTIENE LA FIRMA ELECTRÓNICA CERTIFICADA DEL NOTARIO.`, margin, y);
+                doc.text(`FIRMA ELECTRÓNICA CERTIFICADA DEL NOTARIO APLICADA.`, margin, y);
                 y += lineHeight;
                 doc.setFont('helvetica', 'normal');
-                doc.text(`CÓDIGO QR DE VERIFICACIÓN: ${folioCode}`, margin, y);
-                doc.text(`*Escanee este código QR para verificar la autenticidad y el estado del documento en el sistema del Archivo General de Protocolos (AGP).*`, margin, y + lineHeight);
+                doc.text(`CÓDIGO DE VERIFICACIÓN: ${folioCode}`, margin, y);
 
                 doc.save(`Instrumento_Publico_${instrumentData.type.replace(/\s/g, '_')}_${folioCode}.pdf`);
             }
